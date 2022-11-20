@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+    
+    tools {
+        nodejs 'NodeJs-16'
+    }
+    
+    environment {
+        BUILD_IDENTIFIER = "${BUILD_ID}"
+        HEROKU_URL= 'https://calm-meadow-91653.herokuapp.com/'
+    }
+    
+    stages {
+        stage('Clone repository') {
+            steps {
+                echo "${BUILD_IDENTIFIER}"
+                echo "${HEROKU_URL}"
+                echo 'Cloning repository'
+                git 'https://github.com/EvelyneMwende/gallery'
+            }
+        }
+        stage('Install packages ') {
+            steps {
+                echo 'Installing packages'
+                sh 'npm install'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Testing'
+                sh 'npm install'
+                sh 'npm test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to Heroku'
+                withCredentials([usernameColonPassword(credentialsId: 'heroku', variable: 'HEROKU_CREDENTIALS' )]){
+                    sh 'git push https://${HEROKU_CREDENTIALS}@git.heroku.com/calm-meadow-91653.git master'
+                }
+            }
+        }
+        
+    }
+    
+    post {
+        success {
+            slackSend color: "good", message: "Build ID : ${BUILD_ID} \nHeroku URL: https://calm-meadow-91653.herokuapp.com/"
+            
+        }
+        
+        failure {
+            emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+            
+        }
+    }
+    
+}
