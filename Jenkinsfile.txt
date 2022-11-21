@@ -17,7 +17,7 @@ pipeline {
                 git 'https://github.com/EvelyneMwende/gallery'
             }
         }
-        stage('Install packages ') {
+        stage('Build') {
             steps {
                 echo 'Installing packages'
                 sh 'npm install'
