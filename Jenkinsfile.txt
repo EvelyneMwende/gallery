@@ -13,8 +13,6 @@ pipeline {
     stages {
         stage('Clone repository') {
             steps {
-                echo "${BUILD_IDENTIFIER}"
-                echo "${HEROKU_URL}"
                 echo 'Cloning repository'
                 git 'https://github.com/EvelyneMwende/gallery'
             }
