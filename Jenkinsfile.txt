@@ -8,6 +8,30 @@ pipeline {
     environment {
         BUILD_IDENTIFIER = "${BUILD_ID}"
         HEROKU_URL= 'https://calm-meadow-91653.herokuapp.com/'
+        
+        EMAIL_BODY = 
+
+        """
+
+            <p>EXECUTED: Job <b>\'${env.JOB_NAME}:${env.BUILD_NUMBER})\'</b></p>
+
+            <p>
+
+            View console output at 
+
+            "<a href="${env.BUILD_URL}">${env.JOB_NAME}:${env.BUILD_NUMBER}</a>"
+
+            </p> 
+
+            <p><i>(Build log is attached.)</i></p>
+
+        """
+
+        EMAIL_SUBJECT_SUCCESS = "Status: 'SUCCESS' -Job \'${env.JOB_NAME}:${env.BUILD_NUMBER}\'" 
+
+        EMAIL_SUBJECT_FAILURE = "Status: 'FAILURE' -Job \'${env.JOB_NAME}:${env.BUILD_NUMBER}\'" 
+
+        EMAIL_RECEPIENT = 'evelynemwende8@gmail.com'
     }
     
     stages {
@@ -49,7 +73,12 @@ pipeline {
         }
         
         failure {
-            emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+             emailext attachLog: true, 
+                body: EMAIL_BODY, 
+
+                subject: EMAIL_SUBJECT_FAILURE, 
+
+                to: EMAIL_RECEPIENT
             
         }
     }
